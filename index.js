@@ -1,7 +1,8 @@
-const { prompt } = require("inquirer")
-require("console.table")
-const DB = require("./DB")
-const title = require("asciiart-logo")
+const { prompt } = require("inquirer");
+require("console.table");
+const DB = require("./DB");
+const title = require("asciiart-logo");
+const util = require("util");
 start();
 function start() {
     const titleText = title({
@@ -9,6 +10,20 @@ function start() {
     }).render();
     console.log(titleText)
 }
+const connection = mysql.createConnection({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "SoccerTime253!",
+    database: "employeesdb"
+});
+connection.connect(function (err) {
+    if (err) throw err;
+    console.log("I am connected")
+    connection.query = util.promisify(connection.query);
+    runAction();
+});
+
 async function loadPrompts() {
     const { prompt } = await prompt([
 
@@ -65,7 +80,7 @@ async function loadPrompts() {
     loadPrompts();
   };
 
-  
+} 
   
   
   
