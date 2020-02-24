@@ -1,6 +1,7 @@
-const { prompt } = require("inquirer");
+
+const inquirer = require("inquirer");
 require("console.table");
-const DB = require("./DB");
+//const DB = require("employeeTrackerDB");
 const title = require("asciiart-logo");
 const util = require("util");
 start();
@@ -10,22 +11,23 @@ function start() {
     }).render();
     console.log(titleText)
 }
+const mysql = require ("mysql");
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "SoccerTime253!",
-    database: "employeesdb"
+    password: "password",
+    database: "employee_db"
 });
 connection.connect(function (err) {
     if (err) throw err;
     console.log("I am connected")
     connection.query = util.promisify(connection.query);
-    runAction();
+    loadPrompts();
 });
 
 async function loadPrompts() {
-    const { prompt } = await prompt([
+    inquirer.prompt([
 
 
         {
@@ -74,22 +76,21 @@ async function loadPrompts() {
       return quit();
   }
   async function viewEmployees() {
-    const employees = await DB.findAllEmployees();
-    console.log("\n");
-    console.table(employees);
-    loadPrompts();
-  };
+      try {        
+      
+        const employees = await findAllEmployees();
+        console.log("\n");
+        console.table(employees);
+        loadPrompts();
+          
+      }catch (err) {
+          console.log(err);
+      
 
-} 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+          
+      
+    
+
+      } 
+    }}
   
