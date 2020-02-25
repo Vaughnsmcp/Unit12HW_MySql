@@ -36,29 +36,36 @@ async function loadPrompts() {
                     value: "VIEW_EMPLOYEES",
                 },
                 {
-                    name: "View All Employees By Department",
-                    value: "VIEW_EMPLOYEES_BY_DEPARTMENT"
+                    name: "View All Roles",
+                    value: "VIEW_ALL_ROLES"
                 },
                 {
-                    name: "View All Employees By Manager",
-                    value: "VIEW_EMPLOYEES_BY_MANAGER"
+                    name: "View All Employees By Department",
+                    value: "VIEW_ALL_DEPARTMENTS"
+                },
+                {
+                    name: "Add Department",
+                    value: "ADD_DEPARTMENT"
                 },
                 {
                     name: "quit",
                     value: "exit"
                 }
+
             ]
         }
     ])
     switch (choice) {
         case "VIEW_EMPLOYEES":
             return await viewEmployees();
-        case "VIEW_EMPLOYEES_BY_DEPARTMENT":
-            return viewEmployeesByDepartment();
+        case "VIEW_ALL_ROLES":
+            return await viewRoles();
         case "VIEW_EMPLOYEES_BY_MANAGER":
-            return viewEmployeesByManager();
-        case "VIEW_EMPLOYEES_BY_":
-            return viewEmployeesBy();
+            return await viewEmployeesByManager();
+        case "VIEW_ALL_DEPARTMENTS":
+            return await viewDepartments();
+        case "ADD_DEPARTMENT":
+            return await addDepartment();
         case "exit":
             connection.end();
             break;
@@ -71,8 +78,48 @@ async function viewEmployees() {
         console.log("\n");
         console.table(employees);
         loadPrompts();
-
     } catch (err) {
+        console.log(err);
+    }
+}
+async function viewRoles() {
+    try {
+        const roles = await connection.query("SELECT * FROM role");
+        console.table(roles);
+        console.log("\n");
+        loadPrompts();
+    } catch (err) {
+        console.log(err);
+
+
+    }
+
+}
+async function viewDepartments() {
+    try {
+        const departments = await connection.query("SELECT * FROM department");
+        console.table(departments);
+        console.log("\n");
+        loadPrompts();
+    } catch (err) {
+        console.log(err);
+    }
+}
+async function addDepartment() {
+
+    try {
+        
+        const answer = await inquirer.prompt([{
+            type: "input",
+            name: "department",
+            message: "What's the name of your department, human?"
+        }])
+        await connection.query("INSERT INTO department SET ?", {
+            name: answer.department
+        })
+        await viewDepartments()
+    }
+    catch (err) {
         console.log(err);
     }
 }
