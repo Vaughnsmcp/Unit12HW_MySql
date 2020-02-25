@@ -1,7 +1,6 @@
 
 const inquirer = require("inquirer");
 require("console.table");
-//const DB = require("employeeTrackerDB");
 const title = require("asciiart-logo");
 const util = require("util");
 start();
@@ -11,7 +10,7 @@ function start() {
     }).render();
     console.log(titleText)
 }
-const mysql = require ("mysql");
+const mysql = require("mysql");
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -25,11 +24,8 @@ connection.connect(function (err) {
     connection.query = util.promisify(connection.query);
     loadPrompts();
 });
-
 async function loadPrompts() {
-    inquirer.prompt([
-
-
+    const { choice } = await inquirer.prompt([
         {
             type: "list",
             name: "choice",
@@ -38,7 +34,6 @@ async function loadPrompts() {
                 {
                     name: "view all carbon based life forms",
                     value: "VIEW_EMPLOYEES",
-
                 },
                 {
                     name: "View All Employees By Department",
@@ -48,49 +43,36 @@ async function loadPrompts() {
                     name: "View All Employees By Manager",
                     value: "VIEW_EMPLOYEES_BY_MANAGER"
                 },
-
-
+                {
+                    name: "quit",
+                    value: "exit"
+                }
             ]
-
-
-
-
         }
     ])
     switch (choice) {
         case "VIEW_EMPLOYEES":
-            return viewEmployees();
+            return await viewEmployees();
         case "VIEW_EMPLOYEES_BY_DEPARTMENT":
             return viewEmployeesByDepartment();
         case "VIEW_EMPLOYEES_BY_MANAGER":
             return viewEmployeesByManager();
         case "VIEW_EMPLOYEES_BY_":
             return viewEmployeesBy();
-
         case "exit":
-            Connection.end();
+            connection.end();
             break;
-
-            
-            default:
-      return quit();
-  }
-  async function viewEmployees() {
-      try {        
-      
-        const employees = await findAllEmployees();
+        default:
+    }
+}
+async function viewEmployees() {
+    try {
+        const employees = await connection.query("SELECT * FROM employee");
         console.log("\n");
         console.table(employees);
         loadPrompts();
-          
-      }catch (err) {
-          console.log(err);
-      
 
-          
-      
-    
-
-      } 
-    }}
-  
+    } catch (err) {
+        console.log(err);
+    }
+}
