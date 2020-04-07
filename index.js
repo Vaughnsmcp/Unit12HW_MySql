@@ -40,12 +40,16 @@ async function loadPrompts() {
                     value: "VIEW_ALL_ROLES"
                 },
                 {
-                    name: "View All Employees By Department",
+                    name: "View All Employees By Departments",
                     value: "VIEW_ALL_DEPARTMENTS"
                 },
                 {
                     name: "Add Department",
                     value: "ADD_DEPARTMENT"
+                },
+                {
+                    name: "Add Role",
+                    value: "ADD_ROLE"
                 },
                 {
                     name: "quit",
@@ -66,6 +70,8 @@ async function loadPrompts() {
             return await viewDepartments();
         case "ADD_DEPARTMENT":
             return await addDepartment();
+        case "ADD_ROLE":
+            return await addRole();
         case "exit":
             connection.end();
             break;
@@ -108,7 +114,7 @@ async function viewDepartments() {
 async function addDepartment() {
 
     try {
-        
+
         const answer = await inquirer.prompt([{
             type: "input",
             name: "department",
@@ -118,6 +124,49 @@ async function addDepartment() {
             name: answer.department
         })
         await viewDepartments()
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+async function addRole() {
+
+    const departments = await connection.query("SELECT * FROM department");
+
+
+
+
+
+    const departmentChoices = departments.map(({ id, name }) => ({
+        name: name,
+        value: id
+    }));
+
+    try {
+
+        const answer = await inquirer.prompt([{
+            type: "input",
+            name: "role",
+            message: "What's the name of your role, human?"
+
+
+        },
+        {
+            type: "input",
+            name: "salary",
+            massage: "What is your salary, human?"
+        },
+        {
+            type: "list",
+            name: "department",
+            message: "What human department, human?",
+            choices: departmentChoices
+        }])
+
+        await connection.query("INSERT INTO role SET ?", {
+            title: answer.role, salary: answer.salary, department_id: answer.department
+        })
+        await viewRoles()
     }
     catch (err) {
         console.log(err);
