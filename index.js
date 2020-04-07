@@ -50,6 +50,11 @@ async function loadPrompts() {
                 {
                     name: "Add Role",
                     value: "ADD_ROLE"
+
+                },
+                {
+                    name: "Add Employee",
+                    value: "ADD_EMPLOYEE"
                 },
                 {
                     name: "quit",
@@ -72,6 +77,8 @@ async function loadPrompts() {
             return await addDepartment();
         case "ADD_ROLE":
             return await addRole();
+        case "ADD_EMPLOYEE":
+            return await addEmployee();
         case "exit":
             connection.end();
             break;
@@ -172,3 +179,57 @@ async function addRole() {
         console.log(err);
     }
 }
+async function addEmployee() {
+
+    const roles = await connection.query("SELECT * FROM role");
+    const employees = await connection.query("SELECT * FROM employee");
+
+
+
+
+
+    const rolesChoices = roles.map(({ id, title }) => ({
+        name: title,
+        value: id
+    }));
+    const employeesChoices = employees.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+    }));
+
+    try {
+
+        const answer = await inquirer.prompt([{
+            type: "input",
+            name: "firstName",
+            message: "What is your first name, human?"
+        },
+        {
+            type: "input",
+            name: "lastName",
+            massage: "What is your last name, human?"
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is your worthless role, human?",
+            choices: rolesChoices
+        }, 
+         {
+            type: "list",
+            name: "manager",
+            message: "Who is your worthless human manager, worthless human?",
+            choices: employeesChoices
+        }])
+        
+
+        await connection.query("INSERT INTO employee SET ?", {
+            first_name: answer.firstName, last_name: answer.lastName, role_id: answer.role, manager_id: answer.manager 
+        })
+        await viewEmployees()
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
